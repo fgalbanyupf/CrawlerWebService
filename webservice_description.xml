@@ -1,0 +1,175 @@
+<wsdl:definitions xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://crawlerws.pfc.ratzia.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="CrawlerControllerWebService" targetNamespace="http://crawlerws.pfc.ratzia.com/">
+<wsdl:types>
+<xsd:schema xmlns:tns="http://crawlerws.pfc.ratzia.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://crawlerws.pfc.ratzia.com/">
+<xsd:element name="test" type="tns:test"/>
+<xsd:complexType name="test">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="testString" nillable="true" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="testResponse" type="tns:testResponse"/>
+<xsd:complexType name="testResponse">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" nillable="true" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="stopCrawler" type="tns:stopCrawler"/>
+<xsd:complexType name="stopCrawler">
+<xsd:sequence>
+<xsd:element name="sessionId" type="xsd:long"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="stopCrawlerResponse" type="tns:stopCrawlerResponse"/>
+<xsd:complexType name="stopCrawlerResponse">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" nillable="true" type="xsd:anyType"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="startCrawler" type="tns:startCrawler"/>
+<xsd:complexType name="startCrawler">
+<xsd:sequence>
+<xsd:element name="sessionId" type="xsd:long"/>
+<xsd:element minOccurs="0" name="jail" nillable="true" type="xsd:string"/>
+<xsd:element name="numCrawlers" type="xsd:int"/>
+<xsd:element name="depth" type="xsd:int"/>
+<xsd:element minOccurs="0" name="seed" nillable="true" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="startCrawlerResponse" type="tns:startCrawlerResponse"/>
+<xsd:complexType name="startCrawlerResponse">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" nillable="true" type="xsd:anyType"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="crawlerStatus" type="tns:crawlerStatus"/>
+<xsd:complexType name="crawlerStatus">
+<xsd:sequence>
+<xsd:element name="sessionId" type="xsd:long"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="crawlerStatusResponse" type="tns:crawlerStatusResponse"/>
+<xsd:complexType name="crawlerStatusResponse">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" nillable="true" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="deleteSession" type="tns:deleteSession"/>
+<xsd:complexType name="deleteSession">
+<xsd:sequence>
+<xsd:element name="sessionId" type="xsd:long"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:element name="deleteSessionResponse" type="tns:deleteSessionResponse"/>
+<xsd:complexType name="deleteSessionResponse">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="return" nillable="true" type="xsd:anyType"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+</wsdl:types>
+<wsdl:message name="deleteSessionResponse">
+<wsdl:part element="tns:deleteSessionResponse" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="startCrawlerResponse">
+<wsdl:part element="tns:startCrawlerResponse" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="startCrawler">
+<wsdl:part element="tns:startCrawler" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="testResponse">
+<wsdl:part element="tns:testResponse" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="test">
+<wsdl:part element="tns:test" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="crawlerStatus">
+<wsdl:part element="tns:crawlerStatus" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="deleteSession">
+<wsdl:part element="tns:deleteSession" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="crawlerStatusResponse">
+<wsdl:part element="tns:crawlerStatusResponse" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="stopCrawlerResponse">
+<wsdl:part element="tns:stopCrawlerResponse" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:message name="stopCrawler">
+<wsdl:part element="tns:stopCrawler" name="parameters"></wsdl:part>
+</wsdl:message>
+<wsdl:portType name="CrawlerControllerWebServicePortType">
+<wsdl:operation name="test">
+<wsdl:input message="tns:test" name="test"></wsdl:input>
+<wsdl:output message="tns:testResponse" name="testResponse"></wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="stopCrawler">
+<wsdl:input message="tns:stopCrawler" name="stopCrawler"></wsdl:input>
+<wsdl:output message="tns:stopCrawlerResponse" name="stopCrawlerResponse"></wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="startCrawler">
+<wsdl:input message="tns:startCrawler" name="startCrawler"></wsdl:input>
+<wsdl:output message="tns:startCrawlerResponse" name="startCrawlerResponse"></wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="crawlerStatus">
+<wsdl:input message="tns:crawlerStatus" name="crawlerStatus"></wsdl:input>
+<wsdl:output message="tns:crawlerStatusResponse" name="crawlerStatusResponse"></wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="deleteSession">
+<wsdl:input message="tns:deleteSession" name="deleteSession"></wsdl:input>
+<wsdl:output message="tns:deleteSessionResponse" name="deleteSessionResponse"></wsdl:output>
+</wsdl:operation>
+</wsdl:portType>
+<wsdl:binding name="CrawlerControllerWebServiceSoapBinding" type="tns:CrawlerControllerWebServicePortType">
+<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<wsdl:operation name="test">
+<soap:operation soapAction="test" style="document"/>
+<wsdl:input name="test">
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output name="testResponse">
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="stopCrawler">
+<soap:operation soapAction="stopCrawler" style="document"/>
+<wsdl:input name="stopCrawler">
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output name="stopCrawlerResponse">
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="startCrawler">
+<soap:operation soapAction="startCrawler" style="document"/>
+<wsdl:input name="startCrawler">
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output name="startCrawlerResponse">
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="crawlerStatus">
+<soap:operation soapAction="crawlerStatus" style="document"/>
+<wsdl:input name="crawlerStatus">
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output name="crawlerStatusResponse">
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+<wsdl:operation name="deleteSession">
+<soap:operation soapAction="deleteSession" style="document"/>
+<wsdl:input name="deleteSession">
+<soap:body use="literal"/>
+</wsdl:input>
+<wsdl:output name="deleteSessionResponse">
+<soap:body use="literal"/>
+</wsdl:output>
+</wsdl:operation>
+</wsdl:binding>
+<wsdl:service name="CrawlerControllerWebService">
+<wsdl:port binding="tns:CrawlerControllerWebServiceSoapBinding" name="CrawlerControllerWebServicePort">
+<soap:address location="http://localhost:6981/CrawlerControllerWebService"/>
+</wsdl:port>
+</wsdl:service>
+</wsdl:definitions>
