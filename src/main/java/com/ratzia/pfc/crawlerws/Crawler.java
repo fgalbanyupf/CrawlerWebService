@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package com.ratzia.pfc.crawlerws;
 
@@ -21,7 +16,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Worker, Crawler class downloads and persists each crawled page
  * @author frans
  */
 public class Crawler extends WebCrawler {
@@ -31,21 +26,19 @@ public class Crawler extends WebCrawler {
         
       
         private static DBCollection dbCol;
-        //FIXME: We have to remove static, it doesn't work when working with more than one session at a time.
-        //       Having a local sessionId and copying at onStart is not thread proof
-        private static long sessionId;  
-        private static Pattern jail;
+        private long sessionId;  
+        private Pattern jail;
 
         public static void setDB(DB db, String collection) {
                 dbCol = db.getCollection(collection);
         }
         
-        public static void setSessionId(long sessionId) {
-                Crawler.sessionId = sessionId;
+        public void setSessionId(long sessionId) {
+                this.sessionId = sessionId;
         }
         
-        public static void setJailRegexp(Pattern jailRegexp) {
-            Crawler.jail = jailRegexp;
+        public  void setJailRegexp(Pattern jailRegexp) {
+                this.jail = jailRegexp;
         }
         @Override
         public void onStart()  {

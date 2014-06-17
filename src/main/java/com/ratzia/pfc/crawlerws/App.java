@@ -1,6 +1,11 @@
 package com.ratzia.pfc.crawlerws;
 
-import groovyx.net.ws.WSServer;
+/**
+ * Simple main (entry point for Groovy classes)
+ * @author frans
+ */
+
+
 public class App 
 {
     public static void main( String[] args )

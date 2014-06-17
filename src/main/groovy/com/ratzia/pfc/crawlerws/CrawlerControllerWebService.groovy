@@ -24,7 +24,7 @@ import com.mongodb.MongoClient
 import java.util.regex.Pattern;
 
 /**
- *
+ * Web service instance
  * @author frans
  */
 class CrawlerControllerWebService {
@@ -34,7 +34,8 @@ class CrawlerControllerWebService {
     private String dbSessionCollection = "sessions"
     private String frontiersBasePath = "/tmp/frontier/"
     private final String SETTINGSFILE = "settings.properties"
-    CrawlerControllerWebService(){
+    CrawlerControllerWebService(){ 
+        //Load config file values
         if(new File(SETTINGSFILE).exists()){
             def config = new ConfigSlurper().parse(new File(SETTINGSFILE).toURL())
             this.dbAddress = config.dbAddress
@@ -52,6 +53,9 @@ class CrawlerControllerWebService {
     }
         
     public startCrawler(long sessionId, String jail, int numCrawlers, int depth, String seed){
+        //Seed is added as a special case in the jail
+        jail = jail + "|" + seed
+        
         //TODO: Limitar el nombre de threads
         def th = Thread.start {
             EnvironmentConfig envConfig = new EnvironmentConfig();
@@ -64,8 +68,8 @@ class CrawlerControllerWebService {
                 mongoClient = new MongoClient( dbAddress )
                 db = mongoClient.getDB( dbName )
                 Crawler.setDB(db,dbCollection)
-                Crawler.setSessionId(sessionId)
-                Crawler.setJailRegexp(Pattern.compile(jail))
+                //Crawler.setSessionId(sessionId)
+                //Crawler.setJailRegexp(Pattern.compile(jail))
                 sessionCol = db.getCollection(dbSessionCollection)
             } catch (UnknownHostException ex) {
                 Logger.getLogger(CrawlerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -87,44 +91,55 @@ class CrawlerControllerWebService {
              */
             PageFetcher pageFetcher = new PageFetcher(config);
             RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
-            robotstxtConfig.setEnabled(false);  // <---------------- Ignorem robots.txt de moment
+            robotstxtConfig.setEnabled(true);
             //robotstxtConfig.setCacheSize(0);
             RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
 
-            CrawlController controller;
+            SessionCrawlController controller;
             try {
-                controller = new CrawlController(config, pageFetcher, robotstxtServer);
+                controller = new SessionCrawlController(config, pageFetcher, robotstxtServer, sessionId, Pattern.compile(jail));
             } catch (Exception ex) {
                 Logger.getLogger(CrawlerController.class.getName()).log(Level.SEVERE, null, ex);
                 println("No s'ha pogut iniciar el crawler");
                 return;
             }
-            controller.addSeed(seed);
-            controller.startNonBlocking(Crawler.class, numCrawlers); 
-
+            
             //Crawling sessions field (Controlling and IPC)
             BasicDBObject doc = new BasicDBObject("session_id",sessionId).append("shouldStop",false).append("status","running");
             sessionCol.insert(doc);
-
+            
+            controller.addSeed(seed);
+            controller.startNonBlocking(Crawler.class, numCrawlers); 
+            Thread.sleep(30 * 1000);
+            
             Boolean exitCrawling = false;
             while(!exitCrawling && !controller.isFinished()){
+                Boolean stopSession=false;
                 sessionCol.findOne()
                 BasicDBObject session = sessionCol.findOne(new BasicDBObject("session_id", sessionId));
                 if(session){
-                    if(session.getBoolean("shouldStop")){
-                        println "Aturant crawler!!"
+                    stopSession = session.getBoolean("shouldStop")
+                    if(stopSession){
                         session.put("status","stopping")
                         sessionCol.save(session)
-                        controller.shutdown();
                     }
-                    Thread.sleep(30 * 1000);
+                }else{
+                    //Deleted...
+                    stopSession = true
                 }
+                if(stopSession){
+                    println "Aturant crawler!!"
+                    
+                    controller.shutdown()
+                    exitCrawling = true
+                }
+                Thread.sleep(30 * 1000);
             }
             if(exitCrawling){
                 println "Crawling cancel·led"
                 controller.waitUntilFinish();
             }
-
+            
             BasicDBObject session = sessionCol.findOne(new BasicDBObject("session_id", sessionId));
             if(session){
                 if(exitCrawling){
@@ -133,6 +148,11 @@ class CrawlerControllerWebService {
                     session.put("status","finished")
                 }
                 sessionCol.save(session)
+            }else{
+                //Deleted session, purge pages
+                DBCollection collection = db.getCollection(dbCollection)
+                collection.remove(new BasicDBObject("session_id", sessionId));
+                
             }
 
 
@@ -171,6 +191,23 @@ class CrawlerControllerWebService {
             session.put("shouldStop",true)
             sessionCol.save(session)
         }
+    }
+    
+    public deleteSession(long sessionId){
+        MongoClient mongoClient;
+        DB db;
+        DBCollection sessionCol;
+        DBCollection collection;
+
+        mongoClient = new MongoClient( dbAddress )
+        db = mongoClient.getDB( dbName )
+        //Delete session
+        sessionCol = db.getCollection(dbSessionCollection)
+        sessionCol.remove(new BasicDBObject("session_id", sessionId));
+        
+        //Delete pages
+        collection = db.getCollection(dbCollection)
+        collection.remove(new BasicDBObject("session_id", sessionId));
     }
     
     /*'sessionId':crawlerSessionInstance.id,\

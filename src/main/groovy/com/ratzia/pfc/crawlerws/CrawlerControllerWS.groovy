@@ -9,7 +9,7 @@ package com.ratzia.pfc.crawlerws
 //@Grab(group='org.codehaus.groovy.modules', module='groovyws', version='0.5.2')
 import groovyx.net.ws.WSServer
 /**
- *
+ * Web service starter
  * @author frans
  */
 class CrawlerControllerWS {
