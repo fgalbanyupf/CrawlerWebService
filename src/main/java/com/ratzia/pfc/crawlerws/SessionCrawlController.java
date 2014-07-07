@@ -70,6 +70,10 @@ public class SessionCrawlController extends CrawlController {
                                             threads.add(i, thread);
                                             crawler.setThread(thread);
                                             crawler.init(i + 1, controller);
+                                             //Set session ID
+                                            ((Crawler)crawler).setSessionId(sessionId);
+                                            //Set jail
+                                            ((Crawler)crawler).setJailRegexp(jail);
                                             thread.start();
                                             crawlers.remove(i);
                                             crawlers.add(i, crawler);

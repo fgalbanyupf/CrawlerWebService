@@ -105,8 +105,22 @@ class CrawlerControllerWebService {
             }
             
             //Crawling sessions field (Controlling and IPC)
-            BasicDBObject doc = new BasicDBObject("session_id",sessionId).append("shouldStop",false).append("status","running");
-            sessionCol.insert(doc);
+            BasicDBObject doc = sessionCol.findOne(new BasicDBObject("session_id", sessionId));
+            if(doc){
+                //FIXME: Not thread safe
+                //Update (restart)
+                if(doc.get("status") == "canceled"){
+                    doc.put("status","running")
+                    doc.put("shouldStop",false)
+                    sessionCol.save(doc)
+                }else{
+                    println("Crawler is already running or finished");
+                    throw new IllegalArgumentException("Crawler is already running or finished"); 
+                }
+            }else{
+                doc = new BasicDBObject("session_id",sessionId).append("shouldStop",false).append("status","running");
+                sessionCol.insert(doc);
+            }
             
             controller.addSeed(seed);
             controller.startNonBlocking(Crawler.class, numCrawlers); 
@@ -173,6 +187,19 @@ class CrawlerControllerWebService {
             
         BasicDBObject session = sessionCol.findOne(new BasicDBObject("session_id", sessionId));
         return session.get("status") //We want it to crash if there is no matching session_id
+    }
+    
+    //Throws several exceptions, we want the webservice call to crash if something failed
+    public long crawlerPageCount(long sessionId){
+        MongoClient mongoClient;
+        DB db;
+        DBCollection col;
+
+        mongoClient = new MongoClient( dbAddress )
+        db = mongoClient.getDB( dbName )
+        col = db.getCollection(dbCollection)
+            
+        return col.find(new BasicDBObject("session_id", sessionId)).count();
     }
         
     //Throws several exceptions, we want the webservice call to crash if something failed
